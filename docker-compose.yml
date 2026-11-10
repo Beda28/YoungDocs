@@ -18,10 +18,16 @@ services:
       DB_NAME: ${MYSQL_DATABASE:-youngdocs}
       DB_USER: ${MYSQL_USER:-youngdocs}
       DB_PASSWORD: ${MYSQL_PASSWORD:-youngdocs}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     depends_on:
       fastapi:
         condition: service_healthy
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
@@ -62,6 +68,20 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  redis:
+    image: redis:8-alpine
+    networks:
+      - internal
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
   nginx:
     build: ./nginx
     networks:
@@ -86,3 +106,4 @@ networks:
 volumes:
   frontend-dist:
   mysql-data:
+  redis-data:

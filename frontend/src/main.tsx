@@ -1,5 +1,7 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import Home           from './pages/home';
+import { StrictMode }    from 'react';
+import { createRoot }    from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App               from './app';
+import './index.css';
 
-createRoot(document.getElementById('root')!).render(<StrictMode><Home /></StrictMode>);
+createRoot(document.getElementById('root')!).render(<StrictMode><BrowserRouter><App /></BrowserRouter></StrictMode>);

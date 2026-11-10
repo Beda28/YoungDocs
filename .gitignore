@@ -92,6 +92,7 @@ Desktop.ini
 $RECYCLE.BIN/
 
 /mysql-data/
+/redis-data/
 /frontend-dist/
 /backups/
 /fastapi/uploads/
