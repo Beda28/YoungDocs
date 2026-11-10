@@ -1,5 +1,6 @@
 import client from './client';
 
+
 export type Health = {
   status:  number;
   fastapi: number | null;

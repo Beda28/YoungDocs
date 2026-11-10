@@ -8,6 +8,8 @@ services:
 
   backend:
     build: ./backend
+    volumes:
+      - receipts:/app/uploads
     networks:
       - internal
     environment:
@@ -107,3 +109,4 @@ volumes:
   frontend-dist:
   mysql-data:
   redis-data:
+  receipts:

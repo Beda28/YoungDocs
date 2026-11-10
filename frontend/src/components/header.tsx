@@ -5,14 +5,15 @@ import { message }    from '../api/client';
 import { useSession } from '../api/session';
 
 const Header = () => {
-  const { user, ready }    = useSession();
-  const [busy,  setBusy]   = useState(false);
-  const [error, setError]  = useState('');
+  const { user, ready }   = useSession();
+  const [busy,  setBusy]  = useState(false);
+  const [error, setError] = useState('');
 
   const leave = async () => {
     setBusy(true);
     setError('');
-    try     { await logout(); }
+
+    try { await logout(); }
     catch (error) { setError(message(error)); }
     finally { setBusy(false); }
   };

@@ -4,8 +4,10 @@ import Ledger         from './ledger';
 
 const Home = () => {
   const { user, ready } = useSession();
+
   if (!ready) return <main><p role="status">로그인 확인 중...</p></main>;
   if (user) return <Ledger key={user.id} />;
+
 
   return (
     <main>

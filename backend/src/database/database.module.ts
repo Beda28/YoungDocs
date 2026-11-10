@@ -3,6 +3,8 @@ import { TypeOrmModule }         from '@nestjs/typeorm';
 import { Users1794268800000 }    from './migrations/users.js';
 import { UserName1794268801000 } from './migrations/name.js';
 import { Entries1794268802000 }  from './migrations/entries.js';
+import { Receipt1794268803000 }  from './migrations/receipt.js';
+
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -16,7 +18,7 @@ import { Entries1794268802000 }  from './migrations/entries.js';
     autoLoadEntities: true,
     synchronize:      false,
     migrationsRun:    true,
-    migrations:       [Users1794268800000, UserName1794268801000, Entries1794268802000],
+    migrations:       [Users1794268800000, UserName1794268801000, Entries1794268802000, Receipt1794268803000],
   })],
 })
 export class DatabaseModule {}

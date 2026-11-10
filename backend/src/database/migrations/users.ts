@@ -1,5 +1,6 @@
 import { Table, type MigrationInterface, type QueryRunner } from 'typeorm';
 
+
 export class Users1794268800000 implements MigrationInterface {
   async up(db: QueryRunner) {
     await db.createTable(new Table({
@@ -13,6 +14,5 @@ export class Users1794268800000 implements MigrationInterface {
       ],
     }));
   }
-
   async down(db: QueryRunner) { await db.dropTable('users'); }
 }

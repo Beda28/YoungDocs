@@ -1,5 +1,6 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 
+
 @Injectable()
 export class HealthService {
   async check() {

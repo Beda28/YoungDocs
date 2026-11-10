@@ -1,5 +1,6 @@
 import { Table, TableForeignKey, TableIndex, type MigrationInterface, type QueryRunner } from 'typeorm';
 
+
 export class Entries1794268802000 implements MigrationInterface {
   async up(db: QueryRunner) {
     await db.createTable(new Table({
@@ -16,6 +17,5 @@ export class Entries1794268802000 implements MigrationInterface {
       foreignKeys: [new TableForeignKey({ columnNames: ['userId'], referencedTableName: 'users', referencedColumnNames: ['id'], onDelete: 'CASCADE' })],
     }));
   }
-
   async down(db: QueryRunner) { await db.dropTable('entries'); }
 }

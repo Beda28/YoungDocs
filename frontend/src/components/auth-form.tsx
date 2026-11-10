@@ -8,16 +8,20 @@ const AuthForm = ({ join = false }: { join?: boolean }) => {
   const { user, ready }    = useSession();
   const [busy, setBusy]    = useState(false);
   const [error, setError]  = useState('');
-  const title             = join ? '회원가입' : '로그인';
+  const title              = join ? '회원가입' : '로그인';
 
   const submit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     const form     = new FormData(event.currentTarget);
     const password = String(form.get('password') ?? '');
     const name     = String(form.get('name') ?? '').trim();
+
     if (join && password !== form.get('confirm')) { setError('비밀번호가 일치하지 않습니다.'); return; }
+
     setBusy(true);
     setError('');
+
     try {
       if (join) await signup({ name, password });
       else      await login({ name, password });
@@ -26,7 +30,8 @@ const AuthForm = ({ join = false }: { join?: boolean }) => {
   };
 
   if (!ready) return <main><p role="status">로그인 확인 중...</p></main>;
-  if (user) return <Navigate to="/" replace />;
+  if (user)   return <Navigate to="/" replace />;
+
 
   return (
     <main className="auth">

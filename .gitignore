@@ -97,6 +97,7 @@ $RECYCLE.BIN/
 /backups/
 /fastapi/uploads/
 /fastapi/outputs/
+/backend/uploads/
 *.sql.gz
 *.sqlite
 *.sqlite3
