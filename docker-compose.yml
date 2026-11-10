@@ -1,0 +1,88 @@
+services:
+  frontend:
+    build: ./frontend
+    network_mode: none
+    volumes:
+      - frontend-dist:/shared
+    restart: "no"
+
+  backend:
+    build: ./backend
+    networks:
+      - internal
+    environment:
+      PORT: 3000
+      FASTAPI_URL: http://fastapi:8000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-youngdocs}
+      DB_USER: ${MYSQL_USER:-youngdocs}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-youngdocs}
+    depends_on:
+      fastapi:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  fastapi:
+    build: ./fastapi
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    networks:
+      - internal
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-youngdocs-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-youngdocs}
+      MYSQL_USER: ${MYSQL_USER:-youngdocs}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-youngdocs}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--protocol=TCP", "-h", "127.0.0.1", "--silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  nginx:
+    build: ./nginx
+    networks:
+      - public
+      - internal
+    ports:
+      - "${PORT:-80}:80"
+    volumes:
+      - frontend-dist:/usr/share/nginx/html:ro
+    depends_on:
+      frontend:
+        condition: service_completed_successfully
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  public:
+  internal:
+    internal: true
+
+volumes:
+  frontend-dist:
+  mysql-data:
