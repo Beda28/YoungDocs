@@ -26,7 +26,7 @@ export class EntryDto {
 
   @IsOptional()
   @IsUUID('4')
-  receiptId?: string;
+  receiptId?: string | null;
 }
 
 

@@ -23,11 +23,28 @@ export class EntriesService {
       select: { id: true, type: true, title: true, amount: true, date: true, receiptId: true },
     });
   }
+
+  async get(userId: number, id: number) {
+    const entry = await this.entries.findOne({ where: { id, userId }, select: { id: true, type: true, title: true, amount: true, date: true, receiptId: true } });
+    if (!entry) throw new NotFoundException('내역을 찾을 수 없습니다.');
+    return entry;
+  }
+
   async add(userId: number, data: EntryDto) {
     if (data.receiptId) await this.receipts.path(userId, data.receiptId);
 
     return this.entries.save(this.entries.create({ ...data, userId }));
   }
+
+  async update(userId: number, id: number, data: EntryDto) {
+    await this.get(userId, id);
+    if (data.receiptId) await this.receipts.path(userId, data.receiptId);
+
+    const result = await this.entries.update({ id, userId }, { ...data, receiptId: data.receiptId ?? null });
+    if (!result.affected) throw new NotFoundException('내역을 찾을 수 없습니다.');
+    return this.get(userId, id);
+  }
+
   async remove(userId: number, id: number) {
     const result = await this.entries.delete({ id, userId });
     if (!result.affected) throw new NotFoundException('내역을 찾을 수 없습니다.');

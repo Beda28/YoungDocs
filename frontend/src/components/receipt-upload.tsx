@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { process, read }               from '../api/receipts';
 import { message }                     from '../api/client';
+import ReceiptImages                   from './receipt-images';
 
 
 export type Photo = { id: string | null; busy: boolean; selected: boolean };
-type Props = { value: Photo; onChange: (value: Photo) => void; disabled: boolean };
+type Props = { value: Photo; onChange: (value: Photo) => void; disabled: boolean; saved?: string | null };
 
-const ReceiptUpload = ({ value, onChange, disabled }: Props) => {
+const ReceiptUpload = ({ value, onChange, disabled, saved }: Props) => {
   const [original, setOriginal] = useState('');
   const [result,   setResult]   = useState('');
   const [error,    setError]    = useState('');
@@ -50,6 +51,7 @@ const ReceiptUpload = ({ value, onChange, disabled }: Props) => {
       if (!controller.signal.aborted) onChange({ id, busy: false, selected: true });
     }
   };
+
   const clear = () => {
     task.current?.abort();
     file.current = null;
@@ -67,11 +69,12 @@ const ReceiptUpload = ({ value, onChange, disabled }: Props) => {
       <div className="photo-actions">
         <label className="file-button">사진 선택<input type="file" accept="image/jpeg,image/png,image/webp" disabled={disabled || value.busy} onChange={event => { void select(event.target.files?.[0]); event.target.value = ''; }} /></label>
         <label className="file-button">사진 촬영<input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" disabled={disabled || value.busy} onChange={event => { void select(event.target.files?.[0]); event.target.value = ''; }} /></label>
-        {value.selected && <button type="button" className="delete" onClick={clear} disabled={disabled || value.busy}>사진 제거</button>}
+        {value.selected && <button type="button" className="delete" onClick={clear} disabled={disabled || value.busy}>{value.id ? '사진 연결 해제' : '사진 제거'}</button>}
       </div>
       <p><small>JPG · PNG · WebP, 최대 10MB</small></p>
       {value.busy && <p className="processing" role="status"><span className="spinner" aria-hidden="true" />사진을 처리하고 있습니다...</p>}
       {error && <p role="alert">{error} <button type="button" onClick={() => void select(file.current ?? undefined)} disabled={disabled || value.busy}>다시 처리</button></p>}
+      {saved && value.id === saved && !original && <details><summary>저장된 사진 보기</summary><ReceiptImages id={saved} /></details>}
       {original && (
         <div className="comparison">
           <figure><figcaption>처리 전</figcaption><img src={original} alt="원본 영수증" /></figure>

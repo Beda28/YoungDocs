@@ -83,6 +83,8 @@ td.title { min-width: 120px; white-space: normal; overflow-wrap: anywhere; }
 
 
 .receipt-upload { margin-top: 28px; padding: 20px; background: white; border: 1px solid #dde1e8; border-radius: 8px; }
+.receipt-upload details { margin-top: 16px; }
+.receipt-upload summary { margin-bottom: 12px; font-weight: 600; cursor: pointer; }
 
 
 .processing { display: flex; align-items: center; gap: 12px; }

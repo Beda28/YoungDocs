@@ -78,7 +78,7 @@ const Ledger = () => {
                 <tr key={item.id}>
                   <td>{item.date}</td><td>{item.type === 'income' ? '수입' : '지출'}</td><td className="title">{item.title}</td>
                   <td className={`amount ${item.type}`}>{item.type === 'expense' ? '-' : '+'}{won(item.amount)}</td>
-                  <td>{item.receiptId && <Link to={`/receipts/${item.receiptId}`}>사진</Link>} <button className="delete" aria-label={`${item.title} 삭제`} onClick={() => drop(item.id)} disabled={busy || loading}>삭제</button></td>
+                  <td><Link to={`/entries/${item.id}/edit`}>수정</Link> {item.receiptId && <Link to={`/receipts/${item.receiptId}?month=${month}`}>사진</Link>} <button className="delete" aria-label={`${item.title} 삭제`} onClick={() => drop(item.id)} disabled={busy || loading}>삭제</button></td>
                 </tr>
               ))}</tbody>
             </table>
