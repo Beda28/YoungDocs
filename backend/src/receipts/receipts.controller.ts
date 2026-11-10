@@ -13,6 +13,10 @@ export class ReceiptsController {
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 0 } }))
   process(@Req() req: AuthRequest, @UploadedFile() file?: Express.Multer.File) { return this.service.process(req.user.id, file); }
 
+  @Post(':id/ocr')
+  @Header('Cache-Control', 'private, no-store')
+  recognize(@Req() req: AuthRequest, @Param('id', new ParseUUIDPipe({ version: '4' })) id: string) { return this.service.recognize(req.user.id, id); }
+
   @Get(':id')
   @Header('Cache-Control', 'private, no-store')
   @Header('X-Content-Type-Options', 'nosniff')

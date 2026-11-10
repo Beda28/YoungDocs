@@ -1,9 +1,9 @@
-from threading  import BoundedSemaphore
-from fastapi    import APIRouter, HTTPException, UploadFile
-from src.prep   import load, prep
-from src.detect import find
-from src.warp   import warp, enhance
-from src.save   import save
+from threading         import BoundedSemaphore
+from fastapi           import APIRouter, HTTPException, UploadFile
+from preprocess.prep   import load, prep
+from preprocess.detect import find
+from preprocess.warp   import warp, enhance
+from preprocess.save   import save
 
 import cv2
 

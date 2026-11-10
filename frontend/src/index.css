@@ -98,6 +98,13 @@ td.title { min-width: 120px; white-space: normal; overflow-wrap: anywhere; }
 
 
 .receipt-result { display: block; max-width: 100%; margin: 24px auto; }
+.receipt-ocr { margin-top: 28px; }
+.ocr-results { margin-top: 20px; }
+.ocr-results article { min-width: 0; padding: 16px; border: 1px solid #dde1e8; border-radius: 8px; background: white; }
+.ocr-results pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; line-height: 1.6; }
+.ocr-results ol { padding-left: 24px; }
+.ocr-results li { margin-bottom: 12px; overflow-wrap: anywhere; }
+.ocr-results li small { display: block; }
 
 
 @keyframes spin { to { transform: rotate(360deg); } }

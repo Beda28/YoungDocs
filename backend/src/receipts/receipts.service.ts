@@ -81,6 +81,26 @@ export class ReceiptsService {
 
   async read(userId: number, id: string) { return readFile(await this.path(userId, id)); }
 
+  async recognize(userId: number, id: string) {
+    const image = await this.read(userId, id);
+    const form  = new FormData();
+    form.append('file', new Blob([new Uint8Array(image)], { type: 'image/png' }), 'receipt.png');
+
+    let res: Response;
+    let data: { detail?: string; engine?: string; text?: unknown; lines?: unknown; fields?: unknown };
+    try {
+      res = await fetch(`${process.env.FASTAPI_URL ?? 'http://localhost:8000'}/ocr`, { method: 'POST', body: form, signal: AbortSignal.timeout(180000) });
+      data = await res.json();
+    } catch (error) {
+      if (error instanceof Error && error.name === 'TimeoutError') throw new GatewayTimeoutException('문자 인식 시간이 초과되었습니다.');
+      throw new ServiceUnavailableException('문자 인식 서버에 연결할 수 없습니다.');
+    }
+
+    if (!res.ok) throw new HttpException(data.detail ?? '문자 인식에 실패했습니다.', [413, 422, 503].includes(res.status) ? res.status : 502);
+    if (data.engine !== 'paddleocr' || typeof data.text !== 'string' || !Array.isArray(data.lines) || !data.fields) throw new BadGatewayException('잘못된 문자 인식 결과입니다.');
+    return data;
+  }
+
   async original(userId: number, id: string) {
     await this.path(userId, id);
 

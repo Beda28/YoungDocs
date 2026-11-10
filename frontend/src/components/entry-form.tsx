@@ -1,16 +1,27 @@
-import { useState, type SubmitEvent }          from 'react';
+import { useRef, useState, type SubmitEvent }  from 'react';
 import { Link, useNavigate }                   from 'react-router-dom';
 import { add, update, type Entry, type Draft } from '../api/entries';
 import { message }                             from '../api/client';
 import { today }                               from '../date';
+import { type Fields }                         from '../api/receipts';
 import ReceiptUpload, { type Photo }           from './receipt-upload';
 
 const EntryForm = ({ entry }: { entry?: Entry }) => {
-  const navigate         = useNavigate();
-  const [busy,  setBusy]  = useState(false);
-  const [error, setError] = useState('');
-  const [photo, setPhoto] = useState<Photo>({ id: entry?.receiptId ?? null, busy: false, selected: !!entry?.receiptId });
-  const back             = entry ? `/?month=${entry.date.slice(0, 7)}` : '/';
+  const navigate           = useNavigate();
+  const [busy,  setBusy]    = useState(false);
+  const [error, setError]   = useState('');
+  const [photo, setPhoto]   = useState<Photo>({ id: entry?.receiptId ?? null, busy: false, selected: !!entry?.receiptId });
+  const [date, setDate]     = useState(entry?.date ?? today());
+  const [amount, setAmount] = useState(String(entry?.amount ?? ''));
+  const [filled, setFilled] = useState(false);
+  const dirty              = useRef({ date: !!entry, amount: !!entry });
+  const back               = entry ? `/?month=${entry.date.slice(0, 7)}` : '/';
+
+  const fill = (fields: Fields) => {
+    if (!dirty.current.date) setDate(fields.date ?? today());
+    if (!dirty.current.amount) setAmount(fields.amount === null ? '' : String(fields.amount));
+    setFilled((!dirty.current.date && fields.date !== null) || (!dirty.current.amount && fields.amount !== null));
+  };
 
   const submit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,15 +52,16 @@ const EntryForm = ({ entry }: { entry?: Entry }) => {
   return (
     <main>
       <div className="ledger-heading"><h1>{entry ? '내역 수정' : '내역 추가'}</h1><Link to={back}>{entry ? '취소' : '목록으로'}</Link></div>
-      <ReceiptUpload value={photo} onChange={setPhoto} disabled={busy} saved={entry?.receiptId} />
+      <ReceiptUpload value={photo} onChange={setPhoto} onFields={fill} disabled={busy} saved={entry?.receiptId} />
       <section className="entry-form">
         <h2>내역 입력</h2>
+        {filled && <p role="status">영수증에서 읽은 값을 채웠습니다. 날짜와 금액을 확인한 뒤 저장해주세요.</p>}
         <form onSubmit={submit}>
           <fieldset disabled={busy}>
             <label>구분<select name="type" defaultValue={entry?.type ?? 'expense'}><option value="expense">지출</option><option value="income">수입</option></select></label>
-            <label>날짜<input name="date" type="date" defaultValue={entry?.date ?? today()} min="1000-01-01" max="9999-12-31" required /></label>
+            <label>날짜<input name="date" type="date" value={date} onChange={event => { dirty.current.date = true; setDate(event.target.value); }} min="1000-01-01" max="9999-12-31" required /></label>
             <label className="entry-title">내용<input name="title" defaultValue={entry?.title ?? ''} maxLength={100} placeholder="예: 점심 식사" required /></label>
-            <label>금액 (원)<input name="amount" defaultValue={entry?.amount ?? ''} type="number" inputMode="numeric" min={1} max={2147483647} step={1} required /></label>
+            <label>금액 (원)<input name="amount" value={amount} onChange={event => { dirty.current.amount = true; setAmount(event.target.value); }} type="number" inputMode="numeric" min={1} max={2147483647} step={1} required /></label>
             <button type="submit" disabled={photo.busy || (photo.selected && !photo.id)}>{busy ? '저장 중...' : entry ? '수정 저장' : '저장'}</button>
           </fieldset>
         </form>

@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { useSession }                                from '../api/session';
 import ReceiptImages                                 from '../components/receipt-images';
+import ReceiptOcr                                     from '../components/receipt-ocr';
 
 const Receipt = () => {
   const { id = '' }     = useParams();
@@ -16,6 +17,7 @@ const Receipt = () => {
     <main>
       <div className="ledger-heading"><h1>영수증</h1><Link to={back}>목록으로</Link></div>
       <ReceiptImages key={`${user.id}:${id}`} id={id} />
+      <ReceiptOcr key={`${user.id}:${id}`} id={id} />
     </main>
   );
 };
