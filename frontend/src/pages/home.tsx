@@ -1,32 +1,17 @@
-import { useState }            from 'react';
-import { health, type Health } from '../api/health';
-import { useSession }          from '../api/session';
+import { Link }       from 'react-router-dom';
+import { useSession } from '../api/session';
+import Ledger         from './ledger';
 
 const Home = () => {
-  const { user } = useSession();
-  const [busy,   setBusy]   = useState(false);
-  const [result, setResult] = useState<Health | null>(null);
-  const [error,  setError]  = useState('');
-
-  const check = async () => {
-    setBusy(true);
-    setResult(null);
-    setError('');
-
-    try     { setResult(await health()); }
-    catch   { setError('서버에 연결할 수 없습니다.'); }
-    finally { setBusy(false); }
-  };
+  const { user, ready } = useSession();
+  if (!ready) return <main><p role="status">로그인 확인 중...</p></main>;
+  if (user) return <Ledger key={user.id} />;
 
   return (
     <main>
-      <h1>YoungDocs</h1>
-      <p>{user ? `${user.name}님, 환영합니다.` : '로그인하고 시작하세요.'}</p>
-      <button onClick={check} disabled={busy}>{busy ? 'Checking...' : 'Check'}</button>
-      <div role="status">
-        {result && <p>Nest: {result.status} / FastAPI: {result.fastapi ?? '연결 실패'}</p>}
-        {error  && <p>{error}</p>}
-      </div>
+      <h1>내 가계부</h1>
+      <p>수입과 지출을 기록하세요.</p>
+      <Link to="/login">로그인</Link> · <Link to="/signup">회원가입</Link>
     </main>
   );
 };
